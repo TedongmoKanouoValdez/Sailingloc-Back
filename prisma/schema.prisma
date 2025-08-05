@@ -17,7 +17,7 @@ model Utilisateur {
   adresse             String?
   dernierAcces        DateTime?
   photoProfil         String?
-  telephone           String?
+  telephone           String?               @unique
   commentairesRediges Commentaire[]
   demandes            DemandeProprietaire[]
   medias              Media[]

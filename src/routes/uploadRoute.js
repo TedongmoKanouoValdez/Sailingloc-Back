@@ -20,7 +20,6 @@ router.post(
     try {
       const uploadedUrls = [];
 
-      // ✅ Données textuelles
       const {
         nomBateau = null,
         description = null,
@@ -34,11 +33,9 @@ router.post(
       console.log("Body reçu :", req.body);
       console.log("Fichiers reçus :", Object.keys(req.files || {}));
 
-      // 🧠 Fonction d'association conditionnelle
       const getRelation = (key, id) =>
         id && !isNaN(parseInt(id)) ? { [key]: { connect: { id: parseInt(id) } } } : {};
 
-      // 📂 Mapping des fichiers
       const fileGroups = {
         section1: req.files?.section1 || [],
         section2: req.files?.section2 || [],
@@ -46,7 +43,6 @@ router.post(
         certificat: req.files?.certificat || [],
       };
 
-      // ✅ Upload générique
       const uploadAndSave = async (file, type) => {
         const result = await cloudinary.uploader.upload(file.path, {
           folder: "mon-projet-bateau",
