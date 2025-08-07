@@ -23,12 +23,12 @@ app.use('/upload-documents', uploadRoute);
 const userRoutes = require('./routes/utilisateurRoute');
 app.use('/api/utilisateur', userRoutes);
 
-app.get('/env-test', (req, res) => {
-  res.json({
-    database: process.env.DATABASE_URL,
-    secret: process.env.API_SECRET
-  });
-});
+// app.get('/env-test', (req, res) => {
+//   res.json({
+//     database: process.env.DATABASE_URL,
+//     secret: process.env.API_SECRET
+//   });
+// });
 
 // Démarrer le serveur une seule fois
 const PORT = process.env.PORT || 3001;
