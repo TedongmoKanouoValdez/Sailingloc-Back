@@ -4,9 +4,6 @@ const cors = require("cors");
 
 const app = express();
 
-// Activer CORS
-app.use(cors());
-
 // Middleware pour parser le JSON
 app.use(express.json());
 
@@ -22,6 +19,9 @@ app.use(
     credentials: true, // si tu utilises des cookies ou headers d'authentification
   })
 );
+
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Routes
 const authRoutes = require("./routes/auth");
