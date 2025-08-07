@@ -9,7 +9,7 @@ app.use(express.json());
 
 const allowedOrigins = [
   "http://localhost:3000",            // développement
-  "https://sailingloc.vercel.app",    // front en prod
+  "https://sailingloc-front.vercel.app/",    // front en prod
 ];
 
 app.use(
