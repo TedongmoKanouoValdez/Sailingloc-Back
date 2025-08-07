@@ -10,6 +10,13 @@ app.use(cors());
 // Middleware pour parser le JSON
 app.use(express.json());
 
+app.use(
+  cors({
+    origin: "*",
+    credentials: true, // si tu utilises des cookies ou headers d'authentification
+  })
+);
+
 // Routes
 const authRoutes = require("./routes/auth");
 app.use("/api/auth", authRoutes);
@@ -22,13 +29,6 @@ app.use("/upload-documents", uploadRoute);
 
 const userRoutes = require("./routes/utilisateurRoute");
 app.use("/api/utilisateur", userRoutes);
-
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    credentials: true, // si tu utilises des cookies ou headers d'authentification
-  })
-);
 
 // app.get('/env-test', (req, res) => {
 //   res.json({
