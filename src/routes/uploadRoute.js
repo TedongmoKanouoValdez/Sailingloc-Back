@@ -8,20 +8,6 @@ const prisma = new PrismaClient();
 
 const router = express.Router();
 
-router.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "POST, GET, OPTIONS, PUT, DELETE"
-  );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  if (req.method === "OPTIONS") {
-    res.status(200).end();
-    return;
-  }
-  next();
-});
-
 router.post(
   "/",
   upload.fields([
@@ -48,9 +34,7 @@ router.post(
       console.log("Fichiers reçus :", Object.keys(req.files || {}));
 
       const getRelation = (key, id) =>
-        id && !isNaN(parseInt(id))
-          ? { [key]: { connect: { id: parseInt(id) } } }
-          : {};
+        id && !isNaN(parseInt(id)) ? { [key]: { connect: { id: parseInt(id) } } } : {};
 
       const fileGroups = {
         section1: req.files?.section1 || [],
