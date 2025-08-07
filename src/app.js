@@ -1,6 +1,6 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
 
 const app = express();
 
@@ -11,17 +11,24 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-const authRoutes = require('./routes/auth');
-app.use('/api/auth', authRoutes);
+const authRoutes = require("./routes/auth");
+app.use("/api/auth", authRoutes);
 
-const bateauRoutes = require('./routes/bateauRoute');
-app.use('/api/bateaux', bateauRoutes);
+const bateauRoutes = require("./routes/bateauRoute");
+app.use("/api/bateaux", bateauRoutes);
 
-const uploadRoute = require('./routes/uploadRoute');
-app.use('/upload-documents', uploadRoute);
+const uploadRoute = require("./routes/uploadRoute");
+app.use("/upload-documents", uploadRoute);
 
-const userRoutes = require('./routes/utilisateurRoute');
-app.use('/api/utilisateur', userRoutes);
+const userRoutes = require("./routes/utilisateurRoute");
+app.use("/api/utilisateur", userRoutes);
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true, // si tu utilises des cookies ou headers d'authentification
+  })
+);
 
 // app.get('/env-test', (req, res) => {
 //   res.json({
