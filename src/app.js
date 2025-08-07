@@ -10,9 +10,14 @@ app.use(cors());
 // Middleware pour parser le JSON
 app.use(express.json());
 
+const allowedOrigins = [
+  "http://localhost:3000",            // développement
+  "https://sailingloc.vercel.app",    // front en prod
+];
+
 app.use(
   cors({
-    origin: "*",
+    origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true, // si tu utilises des cookies ou headers d'authentification
   })
