@@ -4,24 +4,35 @@ const cors = require("cors");
 
 const app = express();
 
-// Middleware pour parser le JSON
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
+// Origines autorisées
 const allowedOrigins = [
-  "http://localhost:3000",            // développement
-  "https://sailingloc-front.vercel.app",    // front en prod
+  "http://localhost:3000", // développement local
+  "https://sailingloc-front.vercel.app", // production
 ];
 
+// CORS dynamique
 app.use(
   cors({
-    origin: allowedOrigins,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    credentials: true, // si tu utilises des cookies ou headers d'authentification
+    origin: function (origin, callback) {
+      // Autoriser les requêtes sans "origin" (Postman, tests internes)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true, // important si tu utilises cookies / sessions
   })
 );
 
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+// Gérer les pré-requêtes OPTIONS
+app.options("*", cors());
 
 // Routes
 const authRoutes = require("./routes/auth");
