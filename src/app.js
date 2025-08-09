@@ -31,7 +31,19 @@ app.use(
   })
 );
 
-// Gérer les pré-requêtes OPTIONS
+// ==================== Forcer headers CORS en global ====================
+app.use((req, res, next) => {
+  const origin = allowedOrigins.includes(req.headers.origin)
+    ? req.headers.origin
+    : allowedOrigins[1]; // Par défaut, prend sailingloc-front.vercel
+
+  res.header("Access-Control-Allow-Origin", origin);
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
+});
+
+// ==================== Gérer OPTIONS (Preflight) ====================
 app.options("*", cors());
 
 // Routes
