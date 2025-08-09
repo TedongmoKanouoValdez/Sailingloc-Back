@@ -1,4 +1,4 @@
-const app = require('./src/app');
+const app = require("./src/app");
 
 // // Démarrer le serveur
 // const PORT = process.env.PORT || 3001;
@@ -12,5 +12,3 @@ if (require.main === module) {
     console.log(`Serveur démarré sur http://localhost:${PORT}`);
   });
 }
-
-module.exports = app;

@@ -48,3 +48,4 @@ app.use("/api/utilisateur", userRoutes);
 //     database: process.env.DATABASE_URL,
 //     secret: process.env.API_SECRET
 //   });
+module.exports = app;
