@@ -1,12 +1,25 @@
 const express = require("express");
-const fs = require("fs-extra");
 const path = require("path");
 const upload = require("../middleware/upload");
 const cloudinary = require("../utils/cloudinaryConfig");
 const { PrismaClient } = require("@prisma/client");
+const streamifier = require("streamifier");
 const prisma = new PrismaClient();
 
 const router = express.Router();
+
+const uploadToCloudinary = (fileBuffer, folder) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    streamifier.createReadStream(fileBuffer).pipe(stream);
+  });
+};
 
 router.post(
   "/",
@@ -34,7 +47,9 @@ router.post(
       console.log("Fichiers reçus :", Object.keys(req.files || {}));
 
       const getRelation = (key, id) =>
-        id && !isNaN(parseInt(id)) ? { [key]: { connect: { id: parseInt(id) } } } : {};
+        id && !isNaN(parseInt(id))
+          ? { [key]: { connect: { id: parseInt(id) } } }
+          : {};
 
       const fileGroups = {
         section1: req.files?.section1 || [],
@@ -44,9 +59,10 @@ router.post(
       };
 
       const uploadAndSave = async (file, type) => {
-        const result = await cloudinary.uploader.upload(file.path, {
-          folder: "mon-projet-bateau",
-        });
+        const result = await uploadToCloudinary(
+          file.buffer,
+          "mon-projet-bateau"
+        );
 
         const media = await prisma.media.create({
           data: {
@@ -60,7 +76,6 @@ router.post(
           },
         });
 
-        await fs.remove(file.path);
         return media;
       };
 
