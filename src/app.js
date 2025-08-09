@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const serverless = require('serverless-http');
+
 const app = express();
 
 // ==================== Middleware globaux ====================
@@ -48,4 +48,4 @@ app.use("/api/utilisateur", userRoutes);
 //     database: process.env.DATABASE_URL,
 //     secret: process.env.API_SECRET
 //   });
-module.exports.handler = serverless(app);
+module.exports = app;
