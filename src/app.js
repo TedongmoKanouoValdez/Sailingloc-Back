@@ -4,47 +4,31 @@ const cors = require("cors");
 
 const app = express();
 
+// ==================== Middleware globaux ====================
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // Origines autorisées
 const allowedOrigins = [
-  "http://localhost:3000", // développement local
-  "https://sailingloc-front.vercel.app", // production
+  "http://localhost:3000",
+  "https://sailingloc-front.vercel.app",
 ];
 
-// CORS dynamique
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Autoriser les requêtes sans "origin" (Postman, tests internes)
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      } else {
-        return callback(new Error("Not allowed by CORS"));
-      }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true, // important si tu utilises cookies / sessions
-  })
-);
-
-// ==================== Forcer headers CORS en global ====================
 app.use((req, res, next) => {
-  const origin = allowedOrigins.includes(req.headers.origin)
-    ? req.headers.origin
-    : allowedOrigins[1]; // Par défaut, prend sailingloc-front.vercel
-
-  res.header("Access-Control-Allow-Origin", origin);
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
   next();
 });
-
-// ==================== Gérer OPTIONS (Preflight) ====================
-app.options("*", cors());
 
 // Routes
 const authRoutes = require("./routes/auth");
@@ -64,14 +48,3 @@ app.use("/api/utilisateur", userRoutes);
 //     database: process.env.DATABASE_URL,
 //     secret: process.env.API_SECRET
 //   });
-// });
-
-// Démarrer le serveur une seule fois
-const PORT = process.env.PORT || 3001;
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`Serveur démarré sur http://localhost:${PORT}`);
-  });
-}
-
-module.exports = app; // Utile pour les tests ou pour un autre usage
