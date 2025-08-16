@@ -6,4 +6,12 @@ cloudinary.config({
   api_secret: 'O-jrBhybr0d4aI_savipkzyKtpE',
 });
 
-module.exports = cloudinary;
+
+function getPublicIdFromUrl(url) {
+  const urlParts = url.split('/');
+  const filenameWithExt = urlParts.at(-1); // zcfvxf59wgjyfiw4s2b7.png
+  const folder = urlParts.at(-2);          // utilisateurs
+  const [filenameWithoutExt] = filenameWithExt.split('.');
+  return `${folder}/${filenameWithoutExt}`; // utilisateurs/zcfvxf59wgjyfiw4s2b7
+}
+module.exports = {cloudinary, getPublicIdFromUrl};

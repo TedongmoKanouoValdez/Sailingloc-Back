@@ -42,7 +42,7 @@ router.post("/", async (req, res) => {
         prix: data.tarifbateau || new Prisma.Decimal("0"),
         description: data.description,
         datesIndisponibles: JSON.stringify(data.indisponibilites || []),
-        proprietaireId: null, // À remplacer si besoin
+        proprietaireId: 1, // À remplacer si besoin
 
         details: {
           create: {
@@ -86,7 +86,9 @@ router.get("/", async (req, res) => {
     res.json({ success: true, bateaux });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Erreur lors de la récupération des bateaux" });
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la récupération des bateaux" });
   }
 });
 
@@ -95,14 +97,15 @@ router.get("/:id", async (req, res) => {
   try {
     const bateau = await prisma.bateau.findUnique({
       where: { id: parseInt(req.params.id) },
-      include: { 
-        details: true, 
+      include: {
+        details: true,
         medias: true,
         proprietaire: {
           include: {
             utilisateur: true,
           },
-        }, },
+        },
+      },
     });
 
     if (!bateau) {
@@ -121,14 +124,14 @@ router.get("/slug/:slug", async (req, res) => {
   try {
     const bateau = await prisma.bateau.findUnique({
       where: { slug: req.params.slug },
-      include: { 
+      include: {
         details: true,
         medias: true,
         proprietaire: {
           include: {
             utilisateur: true,
           },
-        }, 
+        },
       },
     });
 
@@ -246,6 +249,5 @@ router.delete("/slug/:slug", async (req, res) => {
     res.status(500).json({ error: "Erreur lors de la suppression du bateau" });
   }
 });
-
 
 module.exports = router;
