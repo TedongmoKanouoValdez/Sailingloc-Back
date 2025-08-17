@@ -12,6 +12,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 const allowedOrigins = [
   "http://localhost:3000",
   "https://sailingloc-front.vercel.app",
+  "https://dsp-dev-o23-g1.vercel.app",
 ];
 
 app.use((req, res, next) => {
