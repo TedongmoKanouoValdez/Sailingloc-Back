@@ -2,9 +2,8 @@ const express = require("express");
 const path = require("path");
 const upload = require("../middleware/upload");
 const cloudinary = require("../utils/cloudinaryConfig");
-const { PrismaClient } = require("@prisma/client");
 const streamifier = require("streamifier");
-const prisma = new PrismaClient();
+const prisma = require("../lib/prisma");
 
 const router = express.Router();
 

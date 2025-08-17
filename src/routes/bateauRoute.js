@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { PrismaClient, Prisma } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { Prisma } = require("@prisma/client");
+const prisma = require("../lib/prisma");
 
 // Fonction pour générer un slug à partir du nom
 function generateSlug(text) {

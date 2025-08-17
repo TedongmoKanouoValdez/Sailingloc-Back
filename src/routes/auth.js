@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { PrismaClient, RoleUtilisateur } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { RoleUtilisateur } = require("@prisma/client");
+const prisma = require("../lib/prisma");
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -120,7 +120,7 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Utilisateur non trouvé" });
     }
     const validPassword = await bcrypt.compare(password, user.motDePasse);
-    
+
     if (!validPassword) {
       return res.status(401).json({ message: "Mot de passe incorrect" });
     }
