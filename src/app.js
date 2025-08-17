@@ -49,6 +49,9 @@ app.use("/api/payment", paymentRoutes);
 const emailRoutes = require("./routes/contactRoutes");
 app.use("/emails", emailRoutes);
 
+const commentaireRoutes = require("./routes/commentaireRoutes");
+app.use("/api/commentaires", commentaireRoutes);
+
 // app.get('/env-test', (req, res) => {
 //   res.json({
 //     database: process.env.DATABASE_URL,
