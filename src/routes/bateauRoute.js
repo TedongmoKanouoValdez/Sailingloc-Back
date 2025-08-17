@@ -81,7 +81,7 @@ router.post("/", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const bateaux = await prisma.bateau.findMany({
-      include: { details: true },
+      include: { details: true, medias: true },
     });
     res.json({ success: true, bateaux });
   } catch (error) {
