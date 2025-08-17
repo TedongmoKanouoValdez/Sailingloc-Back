@@ -41,7 +41,7 @@ model Proprietaire {
 model Bateau {
   id                 Int           @id @default(autoincrement())
   nom                String
-  slug               String        @unique @default("sailingloc-slug")
+  slug               String        @unique @default(dbgenerated("gen_random_uuid()"))
   modele             String
   portdefault        String?
   description        String?
