@@ -92,8 +92,6 @@ router.post("/register", async (req, res) => {
   } catch (error) {
     console.error("Erreur lors de l’inscription :", error);
     res.status(500).json({ message: "Erreur serveur" });
-  } finally {
-    await prisma.$disconnect();
   }
 });
 
@@ -188,8 +186,6 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Erreur serveur" });
-  } finally {
-    await prisma.$disconnect();
   }
 });
 
@@ -223,8 +219,6 @@ router.post("/forgot-password", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Erreur lors de l’envoi de l’email" });
-  } finally {
-    await prisma.$disconnect();
   }
 });
 // Route : /api/auth/reset-password
@@ -260,8 +254,6 @@ router.post("/reset-password", async (req, res) => {
     }
     console.error(err);
     res.status(500).json({ message: "Erreur serveur" });
-  } finally {
-    await prisma.$disconnect();
   }
 });
 
@@ -288,8 +280,6 @@ router.post("/refresh", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(403).json({ message: "Token invalide ou expiré" });
-  } finally {
-    await prisma.$disconnect();
   }
 });
 
