@@ -2,7 +2,7 @@ const express = require("express");
 const {
   getMessagesController,
   markAsReadController,
-  createMessageController,
+  // createMessageController,
   getAllMessagesController,
 } = require("../controllers/message.controller");
 
@@ -15,7 +15,7 @@ router.get("/", getMessagesController);
 router.patch("/:id/lu", markAsReadController);
 
 // POST /messages
-router.post("/", createMessageController);
+// router.post("/", createMessageController);
 
 // route spéciale admin
 router.get("/admin", getAllMessagesController);
