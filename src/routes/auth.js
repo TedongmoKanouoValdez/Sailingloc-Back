@@ -205,7 +205,7 @@ router.post("/forgot-password", async (req, res) => {
     expiresIn: "15m",
   });
 
-  const resetUrl = `http://localhost:3000/resetpassword/${token}`;
+  const resetUrl = `https://dsp-dev-o23-g1.vercel.app/resetpassword/${token}`;
   console.log("Reset URL (DEV) :", resetUrl);
 
   try {
