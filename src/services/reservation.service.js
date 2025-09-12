@@ -1,5 +1,5 @@
 // reservation.service.js
-// auth.js
+const { Prisma } = require("@prisma/client");
 const prisma = require("../utils/prismaClient");
 
 function createAppError(message, statusCode = 400) {
