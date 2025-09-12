@@ -19,6 +19,7 @@ model Utilisateur {
   dernierAcces DateTime?
   photoProfil  String?
 
+  bateaux             Bateau[]              @relation("BateauToUtilisateur")
   proprietaire        Proprietaire?
   reservations        Reservation[]
   messagesEnvoyes     Message[]             @relation("MessagesEnvoyes")
@@ -26,6 +27,16 @@ model Utilisateur {
   demandes            DemandeProprietaire[]
   medias              Media[]
   commentairesRediges Commentaire[]
+
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id        Int         @id @default(autoincrement())
+  token     String      @unique
+  userId    Int         @unique
+  user      Utilisateur @relation(fields: [userId], references: [id])
+  expiresAt DateTime
 }
 
 model Proprietaire {
@@ -33,22 +44,20 @@ model Proprietaire {
   utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
   utilisateurId Int         @unique
   contact       String?
-
-  bateaux Bateau[]
 }
 
 model Bateau {
-  id                 Int           @id @default(autoincrement())
+  id                 Int          @id @default(autoincrement())
   nom                String
-  slug               String        @unique @default(dbgenerated("gen_random_uuid()"))
+  slug               String       @unique @default(dbgenerated("gen_random_uuid()"))
   modele             String
   portdefault        String?
   description        String?
   typeBateau         String?
   datesIndisponibles String?
-  proprietaire       Proprietaire? @relation(fields: [proprietaireId], references: [id])
+  proprietaire       Utilisateur? @relation(name: "BateauToUtilisateur", fields: [proprietaireId], references: [id])
   proprietaireId     Int?
-  creeLe             DateTime      @default(now())
+  creeLe             DateTime     @default(now())
 
   reservations Reservation[]
   assurances   Assurance[]
@@ -108,8 +117,8 @@ model Reservation {
   statut                  StatutReservation
   data                    String?
   creeLe                  DateTime          @default(now())
-  urlDocumentContrat      String?
-  urlRecu                 String?
+  montantFinal            Decimal?
+  commission              Decimal?
 
   paiement     Paiement?
   contrat      Contrat?      @relation(name: "ContratToReservation")
