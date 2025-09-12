@@ -1,7 +1,8 @@
-const { PrismaClient } = require("@prisma/client");
 const { cloudinary } = require("../utils/cloudinaryConfig");
 const streamifier = require("streamifier");
-const prisma = new PrismaClient();
+// auth.js
+const prisma = require("../utils/prismaClient");
+
 
 async function uploadRecuService(fileBuffer, fileName, reservationId) {
   // Récupère le paiement lié à la réservation

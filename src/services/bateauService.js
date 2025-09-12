@@ -1,5 +1,5 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+// auth.js
+const prisma = require("../utils/prismaClient");
 
 const creerBateauService = async (data) => {
   console.log("Données reçues dans creerBateauService :", data);

@@ -1,6 +1,6 @@
 // reservation.service.js
-const { PrismaClient, Prisma } = require("@prisma/client"); // CommonJS
-const prisma = new PrismaClient();
+// auth.js
+const prisma = require("../utils/prismaClient");
 
 function createAppError(message, statusCode = 400) {
   const err = new Error(message);

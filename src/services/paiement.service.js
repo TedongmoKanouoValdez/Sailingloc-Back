@@ -1,10 +1,6 @@
-const {
-  PrismaClient,
-  EtatPaiement,
-  StatutReservation,
-  Prisma,
-} = require("@prisma/client");
-const prisma = new PrismaClient();
+const { EtatPaiement, StatutReservation, Prisma } = require("@prisma/client");
+// auth.js
+const prisma = require("../utils/prismaClient");
 
 function createAppError(message, statusCode = 400) {
   const err = new Error(message);

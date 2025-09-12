@@ -1,5 +1,5 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+// auth.js
+const prisma = require("../utils/prismaClient");
 
 // Récupérer les messages d'un utilisateur
 async function getMessagesForUser(userId, type = "recus", skip = 0, take = 20) {

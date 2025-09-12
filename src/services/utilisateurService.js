@@ -1,8 +1,9 @@
-const { PrismaClient, RoleUtilisateur, TypeMedia } = require("@prisma/client");
+const { TypeMedia } = require("@prisma/client");
 const {
   validateUtilisateurInput,
 } = require("../validation/utilisateurValidation");
-const prisma = new PrismaClient();
+// auth.js
+const prisma = require("../utils/prismaClient");
 
 const bcrypt = require("bcrypt");
 const { cloudinary, getPublicIdFromUrl } = require("../utils/cloudinaryConfig");

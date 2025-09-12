@@ -5,8 +5,10 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer"); // <- ajoute en haut de auth.js
 const { sendMail } = require("../utils/mailer");
 const { resetPasswordTemplate } = require("../utils/emailTemplate");
-const { PrismaClient, RoleUtilisateur } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { RoleUtilisateur } = require("@prisma/client");
+
+// auth.js
+const prisma = require("../utils/prismaClient");
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
@@ -90,6 +92,8 @@ router.post("/register", async (req, res) => {
   } catch (error) {
     console.error("Erreur lors de l’inscription :", error);
     res.status(500).json({ message: "Erreur serveur" });
+  } finally {
+    await prisma.$disconnect();
   }
 });
 
@@ -184,6 +188,8 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Erreur serveur" });
+  } finally {
+    await prisma.$disconnect();
   }
 });
 
@@ -217,6 +223,8 @@ router.post("/forgot-password", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Erreur lors de l’envoi de l’email" });
+  } finally {
+    await prisma.$disconnect();
   }
 });
 // Route : /api/auth/reset-password
@@ -252,6 +260,8 @@ router.post("/reset-password", async (req, res) => {
     }
     console.error(err);
     res.status(500).json({ message: "Erreur serveur" });
+  } finally {
+    await prisma.$disconnect();
   }
 });
 
@@ -278,6 +288,8 @@ router.post("/refresh", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(403).json({ message: "Token invalide ou expiré" });
+  } finally {
+    await prisma.$disconnect();
   }
 });
 

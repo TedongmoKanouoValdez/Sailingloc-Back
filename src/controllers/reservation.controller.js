@@ -1,6 +1,6 @@
 // reservation.controller.js
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+// auth.js
+const prisma = require("../utils/prismaClient");
 
 // const { createReservation, getReservationsForUser } = require("../services/reservation.service");
 const reservationService = require("../services/reservation.service");

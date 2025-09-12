@@ -1,5 +1,5 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+// auth.js
+const prisma = require("../utils/prismaClient");
 
 exports.getCommentaires = async (req, res) => {
   const { bateauId } = req.query;
@@ -8,7 +8,14 @@ exports.getCommentaires = async (req, res) => {
       where: bateauId ? { bateauId: Number(bateauId) } : {},
       include: {
         auteur: {
-          select: { id: true, nom: true, prenom: true, photoProfil: true, email: true, telephone: true },
+          select: {
+            id: true,
+            nom: true,
+            prenom: true,
+            photoProfil: true,
+            email: true,
+            telephone: true,
+          },
         },
       },
       orderBy: { creeLe: "desc" },

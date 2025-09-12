@@ -1,5 +1,6 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+// auth.js
+const prisma = require("../utils/prismaClient");
+
 const {
   createUserWithPhoto,
   updateUserWithPhoto,
