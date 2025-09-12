@@ -1,18 +1,21 @@
 // services/cloudinaryUploadService.js
-const fs = require('fs');
 const { cloudinary } = require('../utils/cloudinaryConfig');
+const streamifier = require('streamifier');
 
-const uploadToCloudinary = async (localPath) => {
-  try {
-    const result = await cloudinary.uploader.upload(localPath, {
-      folder: 'bateaux',
-    });
-    fs.unlinkSync(localPath); // Supprimer le fichier local après upload
-    return result.secure_url;
-  } catch (err) {
-    console.error('Erreur Cloudinary :', err);
-    throw err;
-  }
+const uploadToCloudinary = (fileBuffer, fileName) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: 'bateaux',
+        public_id: fileName.replace(/\.[^/.]+$/, ""), // retire l'extension si besoin
+      },
+      (err, result) => {
+        if (err) return reject(err);
+        resolve(result.secure_url);
+      }
+    );
+    streamifier.createReadStream(fileBuffer).pipe(stream);
+  });
 };
 
 module.exports = uploadToCloudinary;
