@@ -1,6 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const { cloudinary } = require("../utils/cloudinaryConfig");
-const fs = require("fs");
+const streamifier = require("streamifier");
 const prisma = new PrismaClient();
 
 async function uploadContrat(req, res) {
@@ -18,11 +18,21 @@ async function uploadContrat(req, res) {
       });
     }
 
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "contrats",
-      use_filename: true,
-      unique_filename: false,
-      resource_type: "auto",
+    // Upload buffer vers Cloudinary
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        {
+          folder: "contrats",
+          use_filename: true,
+          unique_filename: false,
+          resource_type: "auto",
+        },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve(result);
+        }
+      );
+      streamifier.createReadStream(req.file.buffer).pipe(stream);
     });
 
     await prisma.media.create({
@@ -33,8 +43,6 @@ async function uploadContrat(req, res) {
         contratId: contrat.id,
       },
     });
-
-    fs.unlinkSync(req.file.path);
 
     res.json({ success: true, url: result.secure_url });
   } catch (err) {
