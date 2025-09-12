@@ -74,9 +74,6 @@ app.use("/api/upload-contrat", contratRoutes);
 const recuRoutes = require("./routes/recuRoutes");
 app.use("/api", recuRoutes);
 
-const userRoutes = require('./routes/utilisateurRoute');
-app.use('/api/utilisateur', userRoutes);
-
 // app.get('/env-test', (req, res) => {
 //   res.json({
 //     database: process.env.DATABASE_URL,
