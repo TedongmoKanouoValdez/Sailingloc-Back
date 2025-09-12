@@ -104,7 +104,9 @@ model Reservation {
   prixSupplementPassagers Decimal?
   prixOptionsPayantes     Decimal?
   Total                   Decimal?
+  heure                   String?
   statut                  StatutReservation
+  data                    String?
   creeLe                  DateTime          @default(now())
   urlDocumentContrat      String?
   urlRecu                 String?
@@ -166,13 +168,14 @@ model Message {
   id             Int          @id @default(autoincrement())
   expediteur     Utilisateur  @relation("MessagesEnvoyes", fields: [expediteurId], references: [id])
   expediteurId   Int
-  destinataire   Utilisateur  @relation("MessagesRecus", fields: [destinataireId], references: [id])
-  destinataireId Int
+  destinataire   Utilisateur? @relation("MessagesRecus", fields: [destinataireId], references: [id])
+  destinataireId Int?
   reservation    Reservation? @relation(fields: [reservationId], references: [id])
   reservationId  Int?
   bateau         Bateau?      @relation(fields: [bateauId], references: [id])
   bateauId       Int?
   contenu        String
+  object         String?
   dateEnvoi      DateTime
   lu             Boolean      @default(false)
   creeLe         DateTime     @default(now())
@@ -248,7 +251,7 @@ enum StatutReservation {
 
 enum MethodePaiement {
   CARTE
-  VIREMENT
+  APPLE_PAY
   PAYPAL
 }
 
@@ -269,6 +272,8 @@ enum TypeMedia {
   ATTESTATION_ASSURANCE
   CERTIFICAT_NAVIGATION
   PROFIL
+  CONTRAT
+  RECUS
 }
 
 enum EtatPaiement {

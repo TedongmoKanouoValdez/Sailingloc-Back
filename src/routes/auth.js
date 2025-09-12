@@ -2,10 +2,14 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { RoleUtilisateur } = require("@prisma/client");
-const prisma = require("../lib/prisma");
+const nodemailer = require("nodemailer"); // <- ajoute en haut de auth.js
+const { sendMail } = require("../utils/mailer");
+const { resetPasswordTemplate } = require("../utils/emailTemplate");
+const { PrismaClient, RoleUtilisateur } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 
 // Regex et fonctions de validation
 const unsafePattern = /[<>{}$;]/;
@@ -126,15 +130,154 @@ router.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
+      {
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+        nom: user.nom,
+        prenom: user.prenom,
+        telephone: user.telephone,
+        photoProfil: user.photoProfil,
+      },
       JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    res.json({ token });
+    // refresh token plus long, secret différent
+    const refreshToken = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+        nom: user.nom,
+        prenom: user.prenom,
+        telephone: user.telephone,
+        photoProfil: user.photoProfil,
+      },
+      JWT_REFRESH_SECRET,
+      { expiresIn: "7d" } // token longue durée
+    );
+
+    // tu peux stocker le refresh token en DB pour le révoquer si besoin
+    const existing = await prisma.refreshToken.findUnique({
+      where: { userId: user.id },
+    });
+    if (existing) {
+      await prisma.refreshToken.update({
+        where: { id: existing.id },
+        data: {
+          token: refreshToken,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
+      });
+    } else {
+      await prisma.refreshToken.create({
+        data: {
+          userId: user.id,
+          token: refreshToken,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
+      });
+    }
+
+    res.json({ token, refreshToken });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+router.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email || !isSafeInput(email) || !emailRegex.test(email)) {
+    return res.status(400).json({ message: "Email invalide" });
+  }
+
+  const user = await prisma.utilisateur.findUnique({ where: { email } });
+  if (!user) {
+    return res.json({ message: "Si l’email existe, un lien a été envoyé." });
+  }
+
+  const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
+    expiresIn: "15m",
+  });
+
+  const resetUrl = `http://localhost:3000/resetpassword/${token}`;
+  console.log("Reset URL (DEV) :", resetUrl);
+
+  try {
+    await sendMail({
+      to: user.email,
+      subject: "Réinitialisation de votre mot de passe",
+      html: resetPasswordTemplate(resetUrl),
+    });
+
+    res.json({ message: "Email envoyé avec success!!!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur lors de l’envoi de l’email" });
+  }
+});
+// Route : /api/auth/reset-password
+router.post("/reset-password", async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  if (!token || !newPassword) {
+    return res
+      .status(400)
+      .json({ message: "Token et nouveau mot de passe requis" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const email = decoded.email;
+
+    const user = await prisma.utilisateur.findUnique({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur introuvable" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.utilisateur.update({
+      where: { email },
+      data: { motDePasse: hashedPassword },
+    });
+
+    res.json({ message: "Mot de passe mis à jour avec succès" });
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Token expiré" });
+    }
+    console.error(err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+router.post("/refresh", async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken)
+    return res.status(400).json({ message: "Refresh token manquant" });
+
+  try {
+    // Vérifier le refresh token en DB
+    const storedToken = await prisma.refreshToken.findUnique({
+      where: { token: refreshToken },
+    });
+    if (!storedToken)
+      return res.status(403).json({ message: "Token invalide" });
+
+    const payload = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
+
+    const newAccessToken = jwt.sign({ userId: payload.userId }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.json({ token: newAccessToken });
+  } catch (err) {
+    console.error(err);
+    res.status(403).json({ message: "Token invalide ou expiré" });
   }
 });
 

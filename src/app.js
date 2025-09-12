@@ -59,6 +59,24 @@ app.use("/emails", emailRoutes);
 const commentaireRoutes = require("./routes/commentaireRoutes");
 app.use("/api/commentaires", commentaireRoutes);
 
+const reservationRoutes = require("./routes/reservation.routes");
+app.use("/api/reservations", reservationRoutes);
+
+const messageRoutes = require("./routes/message.routes");
+app.use("/messages", messageRoutes);
+
+const paiementRoutes = require("./routes/paiement.routes");
+app.use("/api/paiements", paiementRoutes);
+
+const contratRoutes = require("./routes/contrat");
+app.use("/api/upload-contrat", contratRoutes);
+
+const recuRoutes = require("./routes/recuRoutes");
+app.use("/api", recuRoutes);
+
+const userRoutes = require('./routes/utilisateurRoute');
+app.use('/api/utilisateur', userRoutes);
+
 // app.get('/env-test', (req, res) => {
 //   res.json({
 //     database: process.env.DATABASE_URL,

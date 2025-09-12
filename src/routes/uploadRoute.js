@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 const upload = require("../middleware/upload");
-const cloudinary = require("../utils/cloudinaryConfig");
+const { cloudinary } = require("../utils/cloudinaryConfig");
 const streamifier = require("streamifier");
 const prisma = require("../lib/prisma");
 
