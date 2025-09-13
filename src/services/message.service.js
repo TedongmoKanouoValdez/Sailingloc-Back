@@ -7,11 +7,12 @@ async function getMessagesForUser(userId, type = "recus", skip = 0, take = 20) {
 
   let where = {};
   if (type === "recus") {
-    where = {
-      OR: [{ expediteurId: userId }, { destinataireId: userId }],
-    };
-  } else if (type === "envoyes") where = { expediteurId: userId };
-  else throw new Error("Type invalide (recus|envoyes)");
+    // Messages que j'ai reçus
+    where = { expediteurId: userId };
+  } else if (type === "envoyes") {
+    // Messages que j'ai envoyés
+    where = { destinataireId: userId };
+  } else throw new Error("Type invalide (recus|envoyes)");
 
   return prisma.message
     .findMany({
