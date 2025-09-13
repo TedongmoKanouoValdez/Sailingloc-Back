@@ -216,6 +216,8 @@ model DemandeProprietaire {
   dateTraitement DateTime?
 
   medias Media[]
+
+  @@unique([utilisateurId, dateDemande])
 }
 
 model Media {

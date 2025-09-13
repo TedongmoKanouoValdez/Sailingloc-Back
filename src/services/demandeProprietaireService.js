@@ -8,24 +8,28 @@ const dayjs = require("dayjs");
 
 exports.createDemande = async (userId, payload) => {
   const now = dayjs();
-  const today = now.startOf("day").toDate(); // 00:00:00
+  const todayStart = now.startOf("day").toDate(); // 00:00:00
+  const todayEnd = now.endOf("day").toDate(); // 23:59:59
   const sevenDaysAgo = now.subtract(7, "day").startOf("day").toDate();
 
-  //Vérifie s’il y a déjà une demande aujourd’hui
-  const todayDemand = await prisma.demandeProprietaire.findUnique({
+  // Vérifie s’il y a déjà une demande aujourd’hui
+  const todayDemand = await prisma.demandeProprietaire.findFirst({
     where: {
-      utilisateurId_dateDemande: {
-        utilisateurId: Number(userId),
-        dateDemande: today,
+      utilisateurId: Number(userId),
+      dateDemande: {
+        gte: todayStart,
+        lte: todayEnd,
       },
     },
   });
+
   if (todayDemand) {
     const err = new Error("Vous avez déjà envoyé une demande aujourd’hui.");
     err.code = "DAILY_LIMIT";
     throw err;
   }
 
+  // Vérifie s’il y a eu une demande dans les 7 derniers jours
   const lastDemand = await prisma.demandeProprietaire.findFirst({
     where: {
       utilisateurId: Number(userId),
@@ -33,6 +37,7 @@ exports.createDemande = async (userId, payload) => {
     },
     orderBy: { dateDemande: "desc" },
   });
+
   if (lastDemand) {
     const nextAllowed = dayjs(lastDemand.dateDemande)
       .add(7, "day")
@@ -44,11 +49,12 @@ exports.createDemande = async (userId, payload) => {
     throw err;
   }
 
+  // Création de la demande
   return prisma.demandeProprietaire.create({
     data: {
       utilisateur: { connect: { id: Number(userId) } },
       data: JSON.stringify(payload),
-      dateDemande: today,
+      dateDemande: now.toDate(),
       statut: "EN_ATTENTE",
     },
   });
