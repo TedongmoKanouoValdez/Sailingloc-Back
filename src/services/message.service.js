@@ -7,41 +7,31 @@ async function getMessagesForUser(userId, type = "recus", skip = 0, take = 20) {
 
   let where = {};
   if (type === "recus") {
-    // Messages que j'ai reçus
-    where = { expediteurId: userId };
-  } else if (type === "envoyes") {
-    // Messages que j'ai envoyés
-    where = { destinataireId: userId };
-  } else throw new Error("Type invalide (recus|envoyes)");
+    where = {
+      OR: [
+        { destinataireId: userId },
+        { destinataireId: userId }, // inclut les messages globaux
+      ],
+    };
+  } else if (type === "envoyes") where = { expediteurId: userId };
+  else throw new Error("Type invalide (recus|envoyes)");
 
-  return prisma.message
-    .findMany({
-      where,
-      include: {
-        expediteur: {
-          select: { id: true, nom: true, prenom: true, email: true },
-        },
-        destinataire: {
-          select: { id: true, nom: true, prenom: true, email: true },
-        },
-        reservation: true,
-        bateau: true,
+  return prisma.message.findMany({
+    where,
+    include: {
+      expediteur: {
+        select: { id: true, nom: true, prenom: true, email: true },
       },
-      orderBy: { dateEnvoi: "desc" },
-      skip,
-      take,
-    })
-    .then((messages) =>
-      messages.map((msg) => ({
-        ...msg,
-        destinataire: msg.destinataire || {
-          id: null,
-          nom: "Tous",
-          prenom: "",
-          email: "",
-        },
-      }))
-    );
+      destinataire: {
+        select: { id: true, nom: true, prenom: true, email: true },
+      },
+      reservation: true,
+      bateau: true,
+    },
+    orderBy: { dateEnvoi: "desc" },
+    skip,
+    take,
+  });
 }
 
 // Marquer un message comme lu
