@@ -16,22 +16,34 @@ async function getMessagesForUser(userId, type = "recus", skip = 0, take = 20) {
   } else if (type === "envoyes") where = { expediteurId: userId };
   else throw new Error("Type invalide (recus|envoyes)");
 
-  return prisma.message.findMany({
-    where,
-    include: {
-      expediteur: {
-        select: { id: true, nom: true, prenom: true, email: true },
+  return prisma.message
+    .findMany({
+      where,
+      include: {
+        expediteur: {
+          select: { id: true, nom: true, prenom: true, email: true },
+        },
+        destinataire: {
+          select: { id: true, nom: true, prenom: true, email: true },
+        },
+        reservation: true,
+        bateau: true,
       },
-      destinataire: {
-        select: { id: true, nom: true, prenom: true, email: true },
-      },
-      reservation: true,
-      bateau: true,
-    },
-    orderBy: { dateEnvoi: "desc" },
-    // skip,
-    // take,
-  });
+      orderBy: { dateEnvoi: "desc" },
+      skip,
+      take,
+    })
+    .then((messages) =>
+      messages.map((msg) => ({
+        ...msg,
+        destinataire: msg.destinataire || {
+          id: null,
+          nom: "Tous",
+          prenom: "",
+          email: "",
+        },
+      }))
+    );
 }
 
 // Marquer un message comme lu
