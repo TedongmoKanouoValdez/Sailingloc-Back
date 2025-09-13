@@ -28,7 +28,7 @@ async function getMessagesForUser(userId, type = "recus", skip = 0, take = 20) {
       reservation: true,
       bateau: true,
     },
-    // orderBy: { dateEnvoi: "desc" },
+    orderBy: { dateEnvoi: "desc" },
     // skip,
     // take,
   });
