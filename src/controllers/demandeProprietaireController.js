@@ -23,3 +23,21 @@ exports.postDemande = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
+
+// PUT /admin/demandes/:id
+exports.updateStatut = async (req, res) => {
+  const { id } = req.params;
+  const { statut } = req.body;
+
+  if (!["EN_ATTENTE", "ACCEPTEE", "REFUSEE"].includes(statut)) {
+    return res.status(400).json({ message: "Statut invalide" });
+  }
+
+  try {
+    const updated = await service.updateStatut(Number(id), statut);
+    res.json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};

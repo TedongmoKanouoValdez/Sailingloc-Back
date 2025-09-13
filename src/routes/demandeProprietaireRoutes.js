@@ -11,4 +11,7 @@ router.get('/admin/demandes', async (req, res) => {
   res.json(demandes);
 });
 
+// Mettre à jour le statut
+router.put("/admin/demandes/:id", controller.updateStatut);
+
 module.exports = router;
