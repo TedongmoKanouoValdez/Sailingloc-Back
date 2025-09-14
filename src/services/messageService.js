@@ -10,6 +10,7 @@ async function getMessagesForUser(userId, type = "recus", skip = 0, take = 20) {
       OR: [
         { destinataireId: userId }, // Messages reçus
         { expediteurId: userId }, // Messages envoyés
+        { expediteurId: null }, 
       ],
     },
     include: {
