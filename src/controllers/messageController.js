@@ -31,35 +31,14 @@ exports.markAsReadController = async (req, res) => {
 exports.getMessagesController = async (req, res) => {
   try {
     const userId = parseInt(req.query.userId);
-    if (!userId) {
-      return res.status(400).json({ error: "userId est requis dans la query" });
-    }
+    if (!userId) return res.status(400).json({ error: "userId requis" });
 
-    const type = req.query.type || "recus";
+    const type = req.query.type || "all"; // "all" par défaut
     const skip = Number(req.query.skip) || 0;
     const take = Number(req.query.take) || 20;
 
-    const whereClause =
-      type === "envoyes"
-        ? { expediteurId: userId }
-        : { destinataireId: userId };
+    const messages = await service.getMessagesForUser(userId, type, skip, take);
 
-    const messages = await prisma.message.findMany({
-      where: whereClause,
-      include: {
-        expediteur: {
-          select: { id: true, nom: true, prenom: true, email: true },
-        },
-        destinataire: {
-          select: { id: true, nom: true, prenom: true, email: true },
-        },
-      },
-      orderBy: { creeLe: "desc" },
-      skip,
-      take,
-    });
-
-    // nettoyer toutes les chaînes pour éviter UTF8 errors
     const cleanedMessages = messages.map((msg) => ({
       ...msg,
       contenu: cleanString(msg.contenu),
@@ -68,7 +47,7 @@ exports.getMessagesController = async (req, res) => {
 
     res.json({ messages: cleanedMessages });
   } catch (err) {
-    console.error("Erreur getMessagesController:", err);
+    console.error("Erreur:", err);
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
