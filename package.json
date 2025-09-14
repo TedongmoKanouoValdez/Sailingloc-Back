@@ -8,6 +8,20 @@
     "test": "jest",
     "vercel-build": "prisma generate"
   },
+  "jest": {
+    "testMatch": [
+      "**/src/test/unitaire/**/*.test.js",
+      "**/src/test/fonctionnels/**/*.test.js"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/**/*.test.js",
+      "!src/**/*.test.js"
+    ]
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

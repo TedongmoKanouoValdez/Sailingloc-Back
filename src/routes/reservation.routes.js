@@ -6,7 +6,7 @@ const {
   getAllReservations,
   updateReservationStatus,
   getReservationsController,
-} = require("../controllers/reservation.controller");
+} = require("../controllers/reservationController");
 
 const router = express.Router();
 router.post("/", createReservationController);

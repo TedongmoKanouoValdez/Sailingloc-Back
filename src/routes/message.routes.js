@@ -4,7 +4,7 @@ const {
   markAsReadController,
   // createMessageController,
   getAllMessagesController,
-} = require("../controllers/message.controller");
+} = require("../controllers/messageController");
 
 const router = express.Router();
 

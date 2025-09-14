@@ -1,6 +1,6 @@
 // auth.js
 const prisma = require("../utils/prismaClient");
-const service = require("../services/message.service");
+const service = require("../services/messageService");
 
 // fonction utilitaire pour nettoyer les chaînes de caractères
 function cleanString(str) {
@@ -8,27 +8,6 @@ function cleanString(str) {
   // supprime null bytes et caractères non UTF-8
   return str.replace(/\0/g, "");
 }
-
-/**
- * GET /messages?type=recus|envoyes
- */
-exports.getMessagesController = async (req, res) => {
-  try {
-    const userId = parseInt(req.query.userId);
-    if (!userId) {
-      return res.status(400).json({ error: "userId est requis dans la query" });
-    }
-    const type = req.query.type || "recus";
-    const skip = Number(req.query.skip) || 0;
-    const take = Number(req.query.take) || 20;
-
-    const messages = await service.getMessagesForUser(userId, type, skip, take);
-    res.json({ messages });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-};
 
 /**
  * PATCH /messages/:id/lu

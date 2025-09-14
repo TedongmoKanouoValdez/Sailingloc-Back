@@ -4,7 +4,7 @@ const {
   createPaiement,
   getAllPaiements,
   getPaiementsProprietaire,
-} = require("../services/paiement.service");
+} = require("../services/paiementService");
 
 router.post("/", async (req, res) => {
   try {

@@ -1,6 +1,6 @@
 // reservation.controller.js
 const prisma = require("../utils/prismaClient");
-const reservationService = require("../services/reservation.service");
+const reservationService = require("../services/reservationService");
 const { cleanString } = require("../utils/clean");
 
 // --- création réservation ---

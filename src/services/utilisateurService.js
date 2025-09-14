@@ -69,9 +69,8 @@ async function updateUserWithPhoto(id, data, file) {
     where: { id: parseInt(id) },
   });
 
-  if (!utilisateur) {
-    throw new Error("Utilisateur non trouvé");
-  }
+  if (!utilisateur)
+    return res.status(404).json({ message: "Utilisateur non trouvé" });
 
   // 🔹 Hash du mot de passe si modifié
   if (data.motDePasse) {
@@ -196,11 +195,7 @@ async function getAllUtilisateur() {
   try {
     const utilisateurs = await prisma.utilisateur.findMany({
       include: {
-        proprietaire: {
-          include: {
-            bateaux: true,
-          },
-        },
+        bateaux: true, // Inclut directement les bateaux liés à l'utilisateur
       },
     });
 
@@ -213,7 +208,7 @@ async function getAllUtilisateur() {
       adresse: u.adresse,
       role: u.role,
       photoProfil: u.photoProfil,
-      nbbateau: u.proprietaire?.bateaux?.length ?? 0,
+      nbbateau: u.bateaux.length ?? 0,
     }));
 
     //console.log("Utilisateurs avec bateaux :", utilisateursAvecBateaux);

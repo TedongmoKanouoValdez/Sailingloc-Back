@@ -1,4 +1,4 @@
-import { sendEmail } from "../services/contactService.js";
+const { sendEmail } = require("../services/contactService");
 
 export async function handleSendEmail(req, res) {
   try {

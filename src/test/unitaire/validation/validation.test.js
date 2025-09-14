@@ -1,4 +1,4 @@
-const { validateRegisterInput, isSafeInput } = require('./src/validation/authValidation');
+const { validateRegisterInput, isSafeInput } = require('../../../validation/authValidation');
 
 describe('Validation des entrées', () => {
 
