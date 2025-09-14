@@ -53,9 +53,6 @@ app.use("/api/utilisateur", userRoutes);
 const paymentRoutes = require("./routes/paymentRoutes");
 app.use("/api/payment", paymentRoutes);
 
-const emailRoutes = require("./routes/contactRoutes");
-app.use("/emails", emailRoutes);
-
 const commentaireRoutes = require("./routes/commentaireRoutes");
 app.use("/api/commentaires", commentaireRoutes);
 
