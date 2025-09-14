@@ -65,5 +65,5 @@ Installer Locust
 Si Locust n’est pas encore installé :
 pip install locust
 Lancer Locust
-Depuis le dossier contenant ton fichier locustfile.py :
+Depuis le dossier contenant le fichier locustfile.py :
 locust -f locustfile.py --host=http://localhost:3001
