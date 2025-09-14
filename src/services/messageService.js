@@ -8,9 +8,8 @@ async function getMessagesForUser(userId, type = "recus", skip = 0, take = 20) {
   return prisma.message.findMany({
     where: {
       OR: [
-        { destinataireId: userId }, // Messages reçus
-        { expediteurId: userId }, // Messages envoyés
-        { expediteurId: null }, 
+        { destinataireId: 111 }, // Messages reçus
+        { expediteurId: 111 },  
       ],
     },
     include: {
