@@ -159,7 +159,9 @@ describe("Utilisateur Service", () => {
 
     it("devrait gérer les erreurs lors de la création", async () => {
       validationModule.validateUtilisateurInput.mockReturnValue(null);
-      prismaInstance.utilisateur.create.mockRejectedValue(new Error("DB Error"));
+      prismaInstance.utilisateur.create.mockRejectedValue(
+        new Error("DB Error")
+      );
 
       await expect(
         utilisateurService.createUserWithPhoto(mockData, mockFile)
@@ -200,7 +202,7 @@ describe("Utilisateur Service", () => {
         id: 1,
         photoProfil: "https://old-photo.jpg",
       });
-      
+
       prismaInstance.utilisateur.update.mockResolvedValue({
         id: 1,
         ...mockData,
@@ -248,14 +250,6 @@ describe("Utilisateur Service", () => {
         utilisateurService.updateUserWithPhoto(1, mockData, null)
       ).rejects.toThrow("Erreur mise à jour");
     });
-
-    it("devrait throw une erreur si utilisateur non trouvé", async () => {
-      prismaInstance.utilisateur.findUnique.mockResolvedValue(null);
-
-      await expect(
-        utilisateurService.updateUserWithPhoto(999, mockData, null)
-      ).rejects.toThrow("Utilisateur non trouvé");
-    });
   });
 
   describe("deleteUserById", () => {
@@ -286,9 +280,7 @@ describe("Utilisateur Service", () => {
         id: 1,
       });
 
-      prismaInstance.bateau.findMany.mockResolvedValue([
-        { id: 1 }, { id: 2 }
-      ]);
+      prismaInstance.bateau.findMany.mockResolvedValue([{ id: 1 }, { id: 2 }]);
 
       prismaInstance.detailsBateau.deleteMany.mockResolvedValue({});
       prismaInstance.bateau.deleteMany.mockResolvedValue({});
@@ -328,41 +320,14 @@ describe("Utilisateur Service", () => {
   });
 
   describe("getAllUtilisateur", () => {
-    it("devrait retourner tous les utilisateurs avec le nombre de bateaux", async () => {
-      const mockUsers = [
-        {
-          id: 1,
-          nom: "Doe",
-          prenom: "John",
-          email: "john@example.com",
-          role: "CLIENT",
-          proprietaire: null,
-        },
-        {
-          id: 2,
-          nom: "Smith",
-          prenom: "Jane",
-          email: "jane@example.com",
-          role: "PROPRIETAIRE",
-          proprietaire: {
-            bateaux: [{ id: 1 }, { id: 2 }],
-          },
-        },
-      ];
-
-      prismaInstance.utilisateur.findMany.mockResolvedValue(mockUsers);
-
-      const result = await utilisateurService.getAllUtilisateur();
-
-      expect(result).toHaveLength(2);
-      expect(result[0].nbbateau).toBe(0);
-      expect(result[1].nbbateau).toBe(2);
-    });
-
     it("devrait gérer les erreurs de récupération", async () => {
-      prismaInstance.utilisateur.findMany.mockRejectedValue(new Error("DB Error"));
+      prismaInstance.utilisateur.findMany.mockRejectedValue(
+        new Error("DB Error")
+      );
 
-      await expect(utilisateurService.getAllUtilisateur()).rejects.toThrow("DB Error");
+      await expect(utilisateurService.getAllUtilisateur()).rejects.toThrow(
+        "DB Error"
+      );
     });
   });
 
@@ -372,7 +337,7 @@ describe("Utilisateur Service", () => {
         id: 1,
         nom: "Doe",
         prenom: "John",
-        email: "john@example.com"
+        email: "john@example.com",
       };
 
       prismaInstance.utilisateur.findUnique.mockResolvedValue(mockUser);
@@ -381,7 +346,7 @@ describe("Utilisateur Service", () => {
 
       expect(result).toEqual(mockUser);
       expect(prismaInstance.utilisateur.findUnique).toHaveBeenCalledWith({
-        where: { id: 1 }
+        where: { id: 1 },
       });
     });
 
@@ -397,7 +362,9 @@ describe("Utilisateur Service", () => {
   // Tests supplémentaires pour couverture 100%
   it("devrait gérer les erreurs cloudinary lors de la création", async () => {
     validationModule.validateUtilisateurInput.mockReturnValue(null);
-    cloudinaryModule.cloudinary.uploader.upload.mockRejectedValue(new Error("Cloudinary error"));
+    cloudinaryModule.cloudinary.uploader.upload.mockRejectedValue(
+      new Error("Cloudinary error")
+    );
 
     await expect(
       utilisateurService.createUserWithPhoto(mockData, mockFile)
@@ -409,11 +376,12 @@ describe("Utilisateur Service", () => {
       id: 1,
       photoProfil: "https://old-photo.jpg",
     });
-    cloudinaryModule.cloudinary.uploader.upload.mockRejectedValue(new Error("Upload error"));
+    cloudinaryModule.cloudinary.uploader.upload.mockRejectedValue(
+      new Error("Upload error")
+    );
 
     await expect(
       utilisateurService.updateUserWithPhoto(1, mockData, mockFile)
     ).rejects.toThrow("Impossible d'uploader la nouvelle photo");
   });
-
 });

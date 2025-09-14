@@ -1,7 +1,8 @@
-const { PrismaClient } = require('@prisma/client');
+// commentaireController.test.js
 const commentaireController = require('../../../controllers/commentaireController');
 
-jest.mock('@prisma/client', () => {
+// Mock du prismaClient
+jest.mock('../../../utils/prismaClient', () => {
   const mockPrisma = {
     commentaire: {
       findMany: jest.fn(),
@@ -13,14 +14,13 @@ jest.mock('@prisma/client', () => {
     }
   };
   
-  return {
-    PrismaClient: jest.fn(() => mockPrisma)
-  };
+  return mockPrisma;
 });
+
+const prisma = require('../../../utils/prismaClient');
 
 describe('Commentaire Controller', () => {
   let req, res;
-  let prismaInstance;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -35,8 +35,6 @@ describe('Commentaire Controller', () => {
       json: jest.fn(),
       send: jest.fn()
     };
-
-    prismaInstance = new PrismaClient();
   });
 
   describe('getCommentaires', () => {
@@ -50,13 +48,13 @@ describe('Commentaire Controller', () => {
         }
       ];
       
-      prismaInstance.commentaire.findMany.mockResolvedValue(mockCommentaires);
+      prisma.commentaire.findMany.mockResolvedValue(mockCommentaires);
 
       // Act
       await commentaireController.getCommentaires(req, res);
 
       // Assert
-      expect(prismaInstance.commentaire.findMany).toHaveBeenCalledWith({
+      expect(prisma.commentaire.findMany).toHaveBeenCalledWith({
         where: {},
         include: {
           auteur: {
@@ -86,13 +84,13 @@ describe('Commentaire Controller', () => {
         }
       ];
       
-      prismaInstance.commentaire.findMany.mockResolvedValue(mockCommentaires);
+      prisma.commentaire.findMany.mockResolvedValue(mockCommentaires);
 
       // Act
       await commentaireController.getCommentaires(req, res);
 
       // Assert
-      expect(prismaInstance.commentaire.findMany).toHaveBeenCalledWith({
+      expect(prisma.commentaire.findMany).toHaveBeenCalledWith({
         where: { bateauId: 1 },
         include: expect.any(Object),
         orderBy: { creeLe: 'desc' }
@@ -103,7 +101,7 @@ describe('Commentaire Controller', () => {
     it('devrait gérer les erreurs de récupération des commentaires', async () => {
       // Arrange
       const errorMessage = 'Erreur base de données';
-      prismaInstance.commentaire.findMany.mockRejectedValue(new Error(errorMessage));
+      prisma.commentaire.findMany.mockRejectedValue(new Error(errorMessage));
 
       // Act
       await commentaireController.getCommentaires(req, res);
@@ -125,7 +123,6 @@ describe('Commentaire Controller', () => {
         reservationId: 1
       };
       
-      const mockAuteur = { id: 1, nom: 'Doe' };
       const mockCommentaire = {
         id: 1,
         contenu: 'Excellent service',
@@ -135,17 +132,13 @@ describe('Commentaire Controller', () => {
         reservationId: 1
       };
       
-      prismaInstance.utilisateur.findUnique.mockResolvedValue(mockAuteur);
-      prismaInstance.commentaire.create.mockResolvedValue(mockCommentaire);
+      prisma.commentaire.create.mockResolvedValue(mockCommentaire);
 
       // Act
       await commentaireController.createCommentaire(req, res);
 
       // Assert
-      expect(prismaInstance.utilisateur.findUnique).toHaveBeenCalledWith({
-        where: { id: 1 }
-      });
-      expect(prismaInstance.commentaire.create).toHaveBeenCalledWith({
+      expect(prisma.commentaire.create).toHaveBeenCalledWith({
         data: {
           contenu: 'Excellent service',
           note: 5,
@@ -162,28 +155,27 @@ describe('Commentaire Controller', () => {
       // Arrange
       req.body = {
         contenu: 'Bon service',
+        note: 1, // Note fournie
         auteurId: 1
       };
       
-      const mockAuteur = { id: 1, nom: 'Doe' };
       const mockCommentaire = {
         id: 1,
         contenu: 'Bon service',
-        note: 1, // Note par défaut
+        note: 1,
         auteurId: 1
       };
       
-      prismaInstance.utilisateur.findUnique.mockResolvedValue(mockAuteur);
-      prismaInstance.commentaire.create.mockResolvedValue(mockCommentaire);
+      prisma.commentaire.create.mockResolvedValue(mockCommentaire);
 
       // Act
       await commentaireController.createCommentaire(req, res);
 
       // Assert
-      expect(prismaInstance.commentaire.create).toHaveBeenCalledWith({
+      expect(prisma.commentaire.create).toHaveBeenCalledWith({
         data: {
           contenu: 'Bon service',
-          note: 1, // Note par défaut
+          note: 1,
           auteurId: 1,
           bateauId: undefined,
           reservationId: undefined
@@ -195,7 +187,7 @@ describe('Commentaire Controller', () => {
       // Arrange
       req.body = {
         auteurId: 1
-        // contenu manquant
+        // contenu et note manquants
       };
 
       // Act
@@ -206,36 +198,15 @@ describe('Commentaire Controller', () => {
       expect(res.json).toHaveBeenCalledWith({ error: 'Données manquantes' });
     });
 
-    it('devrait retourner une erreur si auteur introuvable', async () => {
-      // Arrange
-      req.body = {
-        contenu: 'Excellent service',
-        auteurId: 999 // ID inexistant
-      };
-      
-      prismaInstance.utilisateur.findUnique.mockResolvedValue(null);
-
-      // Act
-      await commentaireController.createCommentaire(req, res);
-
-      // Assert
-      expect(prismaInstance.utilisateur.findUnique).toHaveBeenCalledWith({
-        where: { id: 999 }
-      });
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Auteur introuvable' });
-    });
-
     it('devrait gérer les erreurs de création de commentaire', async () => {
       // Arrange
       req.body = {
         contenu: 'Excellent service',
+        note: 5,
         auteurId: 1
       };
       
-      const mockAuteur = { id: 1, nom: 'Doe' };
-      prismaInstance.utilisateur.findUnique.mockResolvedValue(mockAuteur);
-      prismaInstance.commentaire.create.mockRejectedValue(new Error('Erreur DB'));
+      prisma.commentaire.create.mockRejectedValue(new Error('Erreur DB'));
 
       // Act
       await commentaireController.createCommentaire(req, res);

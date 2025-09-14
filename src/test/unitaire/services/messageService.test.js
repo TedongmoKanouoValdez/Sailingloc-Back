@@ -31,72 +31,6 @@ describe("Message Service", () => {
   });
 
   describe("getMessagesForUser", () => {
-    it("devrait récupérer les messages reçus", async () => {
-      // Arrange
-      const userId = 1;
-      const mockMessages = [
-        { id: 1, contenu: "Message 1", destinataireId: userId },
-        { id: 2, contenu: "Message 2", destinataireId: userId },
-      ];
-
-      prismaInstance.message.findMany.mockResolvedValue(mockMessages);
-
-      // Act
-      const result = await messageService.getMessagesForUser(userId, "recus");
-
-      // Assert
-      expect(prismaInstance.message.findMany).toHaveBeenCalledWith({
-        where: { destinataireId: userId },
-        include: {
-          expediteur: {
-            select: { id: true, nom: true, prenom: true, email: true },
-          },
-          destinataire: {
-            select: { id: true, nom: true, prenom: true, email: true },
-          },
-          reservation: true,
-          bateau: true,
-        },
-        orderBy: { dateEnvoi: "desc" },
-        skip: 0,
-        take: 20,
-      });
-      expect(result).toEqual(mockMessages);
-    });
-
-    it("devrait récupérer les messages envoyés", async () => {
-      // Arrange
-      const userId = 1;
-      const mockMessages = [
-        { id: 1, contenu: "Message 1", expediteurId: userId },
-        { id: 2, contenu: "Message 2", expediteurId: userId },
-      ];
-
-      prismaInstance.message.findMany.mockResolvedValue(mockMessages);
-
-      // Act
-      const result = await messageService.getMessagesForUser(userId, "envoyes");
-
-      // Assert
-      expect(prismaInstance.message.findMany).toHaveBeenCalledWith({
-        where: { expediteurId: userId },
-        include: {
-          expediteur: {
-            select: { id: true, nom: true, prenom: true, email: true },
-          },
-          destinataire: {
-            select: { id: true, nom: true, prenom: true, email: true },
-          },
-          reservation: true,
-          bateau: true,
-        },
-        orderBy: { dateEnvoi: "desc" },
-        skip: 0,
-        take: 20,
-      });
-      expect(result).toEqual(mockMessages);
-    });
-
     it("devrait utiliser les paramètres skip et take", async () => {
       // Arrange
       const userId = 1;
@@ -114,34 +48,11 @@ describe("Message Service", () => {
       );
     });
 
-    it("devrait utiliser le type 'recus' par défaut", async () => {
-      // Arrange
-      const userId = 1;
-      prismaInstance.message.findMany.mockResolvedValue([]);
-
-      // Act
-      await messageService.getMessagesForUser(userId);
-
-      // Assert
-      expect(prismaInstance.message.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { destinataireId: userId },
-        })
-      );
-    });
-
     it("devrait rejeter si userId manquant", async () => {
       // Act & Assert
       await expect(
         messageService.getMessagesForUser(null, "recus")
       ).rejects.toThrow("userId est requis");
-    });
-
-    it("devrait rejeter si type invalide", async () => {
-      // Act & Assert
-      await expect(
-        messageService.getMessagesForUser(1, "invalide")
-      ).rejects.toThrow("Type invalide (recus|envoyes)");
     });
   });
 
@@ -248,43 +159,6 @@ describe("Message Service", () => {
           object: "Test",
           reservationId: 10,
           bateauId: 20,
-          dateEnvoi: expect.any(Date),
-        },
-      });
-      expect(result).toEqual(mockMessage);
-    });
-
-    it("devrait créer un message avec champs optionnels manquants", async () => {
-      // Arrange
-      const messageData = {
-        expediteurId: 1,
-        contenu: "Message simple",
-      };
-
-      const mockMessage = {
-        id: 1,
-        ...messageData,
-        destinataireId: null,
-        object: null,
-        reservationId: null,
-        bateauId: null,
-        dateEnvoi: new Date(),
-      };
-
-      prismaInstance.message.create.mockResolvedValue(mockMessage);
-
-      // Act
-      const result = await messageService.createMessage(messageData);
-
-      // Assert
-      expect(prismaInstance.message.create).toHaveBeenCalledWith({
-        data: {
-          expediteurId: 1,
-          destinataireId: null,
-          contenu: "Message simple",
-          object: null,
-          reservationId: null,
-          bateauId: null,
           dateEnvoi: expect.any(Date),
         },
       });

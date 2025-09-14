@@ -5,14 +5,13 @@ const prisma = require("../utils/prismaClient");
 async function getMessagesForUser(userId, type = "recus", skip = 0, take = 20) {
   if (!userId) throw new Error("userId est requis");
 
-  let where = {};
-  if (type === "recus") {
-    where = { expediteurId: userId };
-  } else if (type === "envoyes") where = { destinataireId: userId };
-  else throw new Error("Type invalide (recus|envoyes)");
-
   return prisma.message.findMany({
-    where,
+    where: {
+      OR: [
+        { destinataireId: userId }, // Messages reçus
+        { expediteurId: userId }, // Messages envoyés
+      ],
+    },
     include: {
       expediteur: {
         select: { id: true, nom: true, prenom: true, email: true },
